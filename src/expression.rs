@@ -14,6 +14,19 @@ pub enum Expression {
         op: UnaryOperator,
         child: Box<Expression>,
     },
+    Func {
+        param: String,
+        body: Box<Expression>,
+    },
+    If {
+        condition: Box<Expression>,
+        then_expr: Box<Expression>,
+        else_expr: Box<Expression>,
+    },
+    Apply {
+        func_expr: Box<Expression>,
+        arg_expr: Box<Expression>,
+    },
 }
 
 #[derive(PartialEq)]
@@ -41,6 +54,20 @@ impl Display for Expression {
             Expression::Boolean(value) => write!(f, "{}", if *value { "T" } else { "F" }),
             Expression::BinaryOp { op, lhs, rhs } => write!(f, "({} {} {})", lhs, op, rhs),
             Expression::UnaryOp { op, child } => write!(f, "({}{})", op, child),
+            Expression::Func { param, body } => write!(f, "(fn {} => {})", param, body),
+            Expression::If {
+                condition,
+                then_expr,
+                else_expr,
+            } => write!(
+                f,
+                "(if {} then {} else {})",
+                condition, then_expr, else_expr
+            ),
+            Expression::Apply {
+                func_expr,
+                arg_expr,
+            } => write!(f, "({} {})", func_expr, arg_expr),
         }
     }
 }
