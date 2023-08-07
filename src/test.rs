@@ -280,3 +280,59 @@ mod arith_tests {
         assert_eq!("if 1 < 5 then 8 else 9", format!("{}", e));
     }
 }
+
+#[cfg(test)]
+mod nested_tests {
+    use crate::parser::Parser;
+
+    #[test]
+    fn parse_nested_binary_expression() {
+        let mut prog = Parser::new(&"+(1, -(2, 3))");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("1 + 2 - 3", format!("{}", e));
+    }
+
+    #[test]
+    fn parse_nested_apply_expression() {
+        let mut prog = Parser::new(&"apply(func x => -(x, 2), 5)");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("func x => x - 2 (5)", format!("{}", e));
+    }
+
+    #[test]
+    fn parse_nested_if_expression() {
+        let mut prog = Parser::new(&"if <(1, 5) then if <(2, 3) then 2 else 3 else 4");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("if 1 < 5 then if 2 < 3 then 2 else 3 else 4", format!("{}", e));
+    }
+
+    #[test]
+    fn parse_nested_complex_expression() {
+        let mut prog = Parser::new(&"apply(func x => if <(x, 10) then -(10, x) else +(x, 10), 5)");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!(
+            "func x => if x < 10 then 10 - x else x + 10 (5)",
+            format!("{}", e)
+        );
+    }
+
+    #[test]
+    fn parse_nested_multiple_ifs() {
+        let mut prog = Parser::new(&"if <(1, 5) then if <(2, 3) then 2 else 3 else if <(4, 6) then 6 else 4");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!(
+            "if 1 < 5 then if 2 < 3 then 2 else 3 else if 4 < 6 then 6 else 4",
+            format!("{}", e)
+        );
+    }
+}
