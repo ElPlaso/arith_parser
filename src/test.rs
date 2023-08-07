@@ -77,8 +77,8 @@ mod display_tests {
 
 #[cfg(test)]
 mod lexing_tests {
-    use crate::parser::{lex, LexItem};
     use crate::expression::BinaryOperator;
+    use crate::parser::{lex, LexItem};
 
     #[test]
     fn lex_integer() {
@@ -188,6 +188,15 @@ mod arith_tests {
         assert!(result.is_ok());
         let e = result.unwrap();
         assert_eq!("1 + 1", format!("{}", e));
+    }
+
+    #[test]
+    fn parse_nested_plus() {
+        let mut prog = Parser::new(&"+(1, +(1, 1))");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("1 + 1 + 1", format!("{}", e));
     }
 
     #[test]
