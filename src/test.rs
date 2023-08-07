@@ -3,8 +3,6 @@
 mod display_tests {
     use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
-    use super::*;
-
     #[test]
     fn test_display_integer() {
         let expr = Expression::Integer(42);
@@ -33,7 +31,7 @@ mod display_tests {
             lhs: Box::new(Expression::Integer(3)),
             rhs: Box::new(Expression::Integer(4)),
         };
-        assert_eq!(format!("{}", expr), "(3 + 4)");
+        assert_eq!(format!("{}", expr), "3 + 4");
     }
 
     #[test]
@@ -42,7 +40,7 @@ mod display_tests {
             op: UnaryOperator::Not,
             child: Box::new(Expression::Boolean(true)),
         };
-        assert_eq!(format!("{}", expr), "(!T)");
+        assert_eq!(format!("{}", expr), "!T");
     }
 
     #[test]
@@ -55,7 +53,7 @@ mod display_tests {
                 rhs: Box::new(Expression::Integer(2)),
             }),
         };
-        assert_eq!(format!("{}", expr), "(fn x => (x * 2))");
+        assert_eq!(format!("{}", expr), "fn x => x * 2");
     }
 
     #[test]
@@ -65,7 +63,7 @@ mod display_tests {
             then_expr: Box::new(Expression::Integer(42)),
             else_expr: Box::new(Expression::Integer(0)),
         };
-        assert_eq!(format!("{}", expr), "(if T then 42 else 0)");
+        assert_eq!(format!("{}", expr), "if T then 42 else 0");
     }
 
     #[test]
@@ -74,7 +72,7 @@ mod display_tests {
             func_expr: Box::new(Expression::Variable("f".to_string())),
             arg_expr: Box::new(Expression::Integer(10)),
         };
-        assert_eq!(format!("{}", expr), "(f 10)");
+        assert_eq!(format!("{}", expr), "f 10");
     }
 }
 

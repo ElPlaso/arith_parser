@@ -52,22 +52,22 @@ impl Display for Expression {
             Expression::Integer(value) => write!(f, "{}", value),
             Expression::Variable(name) => write!(f, "{}", name),
             Expression::Boolean(value) => write!(f, "{}", if *value { "T" } else { "F" }),
-            Expression::BinaryOp { op, lhs, rhs } => write!(f, "({} {} {})", lhs, op, rhs),
-            Expression::UnaryOp { op, child } => write!(f, "({}{})", op, child),
-            Expression::Func { param, body } => write!(f, "(fn {} => {})", param, body),
+            Expression::BinaryOp { op, lhs, rhs } => write!(f, "{} {} {}", lhs, op, rhs),
+            Expression::UnaryOp { op, child } => write!(f, "{}{}", op, child),
+            Expression::Func { param, body } => write!(f, "fn {} => {}", param, body),
             Expression::If {
                 condition,
                 then_expr,
                 else_expr,
             } => write!(
                 f,
-                "(if {} then {} else {})",
+                "if {} then {} else {}",
                 condition, then_expr, else_expr
             ),
             Expression::Apply {
                 func_expr,
                 arg_expr,
-            } => write!(f, "({} {})", func_expr, arg_expr),
+            } => write!(f, "{} {}", func_expr, arg_expr),
         }
     }
 }
