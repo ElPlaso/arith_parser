@@ -146,10 +146,21 @@ impl Parser {
                     self.current += 1;
                     Ok(Expression::Boolean(*value))
                 }
+                LexItem::UnaryOp(op) => self.parse_unary_expression(op.clone()),
+
                 _ => Err("Expected expression".to_string()),
             }
         } else {
             Err("Unexpected end of input".to_string())
         }
+    }
+
+    fn parse_unary_expression(&mut self, op: UnaryOperator) -> Result<Expression, String> {
+        self.current += 1;
+        let child = self.parse_expression()?;
+        Ok(Expression::UnaryOp {
+            op,
+            child: Box::new(child),
+        })
     }
 }

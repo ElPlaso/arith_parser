@@ -1,6 +1,6 @@
 use std::fmt::{Display, Error};
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Expression {
     Integer(i64),
     Variable(String),
@@ -29,7 +29,7 @@ pub enum Expression {
     },
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -41,7 +41,7 @@ pub enum BinaryOperator {
     Or,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum UnaryOperator {
     Not,
 }
