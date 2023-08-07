@@ -123,11 +123,11 @@ mod lexing_tests {
             result,
             Ok(vec![
                 LexItem::BinaryOp(BinaryOperator::Add),
-                LexItem::OpenParen('('),
+                LexItem::OpenParen,
                 LexItem::Integer(1),
-                LexItem::Comma(','),
+                LexItem::Comma,
                 LexItem::Integer(1),
-                LexItem::CloseParen(')')
+                LexItem::CloseParen
             ])
         );
     }
@@ -140,11 +140,11 @@ mod lexing_tests {
             result,
             Ok(vec![
                 LexItem::BinaryOp(BinaryOperator::Subtract),
-                LexItem::OpenParen('('),
+                LexItem::OpenParen,
                 LexItem::Integer(1),
-                LexItem::Comma(','),
+                LexItem::Comma,
                 LexItem::Integer(1),
-                LexItem::CloseParen(')')
+                LexItem::CloseParen
             ])
         );
     }

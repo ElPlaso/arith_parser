@@ -2,20 +2,20 @@ use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum LexItem {
-    OpenParen(char),          // "("
-    CloseParen(char),         // ")"
-    Comma(char),              // ","
+    OpenParen,          // "("
+    CloseParen,         // ")"
+    Comma,              // ","
     Integer(i64),             // "0", "1", "2", ...
     Variable(String),         // "a", "b", "c", ...
     Boolean(bool),            // "T" or "F"
-    If(String),               // "if"
-    Then(String),             // "then"
-    Else(String),             // "else"
-    Func(String),             // "func"
-    Apply(String),            // "apply"
+    If,               // "if"
+    Then,             // "then"
+    Else,             // "else"
+    Func,             // "func"
+    Apply,            // "apply"
     BinaryOp(BinaryOperator), // "+", "-", "*", "/", "<", "="
     UnaryOp(UnaryOperator),   // "!"
-    Arrow(String),            // "=>"
+    Arrow,            // "=>"
 }
 
 pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
@@ -49,11 +49,11 @@ pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
                     }
                 }
                 match value.as_str() {
-                    "if" => result.push(LexItem::If(value)),
-                    "then" => result.push(LexItem::Then(value)),
-                    "else" => result.push(LexItem::Else(value)),
-                    "func" => result.push(LexItem::Func(value)),
-                    "apply" => result.push(LexItem::Apply(value)),
+                    "if" => result.push(LexItem::If),
+                    "then" => result.push(LexItem::Then),
+                    "else" => result.push(LexItem::Else),
+                    "func" => result.push(LexItem::Func),
+                    "apply" => result.push(LexItem::Apply),
                     _ => result.push(LexItem::Variable(value)),
                 }
             }
@@ -95,7 +95,7 @@ pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
                 if let Some(&c) = iterable.peek() {
                     match c {
                         '>' => {
-                            result.push(LexItem::Arrow("=>".to_string()));
+                            result.push(LexItem::Arrow);
                             iterable.next();
                         }
                         _ => {
@@ -105,15 +105,15 @@ pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
                 }
             }
             '(' => {
-                result.push(LexItem::OpenParen('('));
+                result.push(LexItem::OpenParen);
                 iterable.next();
             }
             ',' => {
-                result.push(LexItem::Comma(','));
+                result.push(LexItem::Comma);
                 iterable.next();
             }
             ')' => {
-                result.push(LexItem::CloseParen(')'));
+                result.push(LexItem::CloseParen);
                 iterable.next();
             }
             ' ' | '\t' => {
@@ -164,9 +164,9 @@ impl Parser {
                 }
                 LexItem::UnaryOp(op) => self.parse_unary_expression(op.clone()),
                 LexItem::BinaryOp(op) => self.parse_binary_expression(op.clone()),
-                LexItem::Func(_) => self.parse_func_expression(),
-                LexItem::Apply(_) => self.parse_apply_expression(),
-                LexItem::If(_) => self.parse_if_expression(),
+                LexItem::Func => self.parse_func_expression(),
+                LexItem::Apply => self.parse_apply_expression(),
+                LexItem::If => self.parse_if_expression(),
 
                 _ => Err("Expected expression".to_string()),
             }
@@ -193,14 +193,14 @@ impl Parser {
         }
 
         // Expect an opening parenthesis '('
-        if let Some(LexItem::OpenParen('(')) = self.tokens.get(self.current) {
+        if let Some(LexItem::OpenParen) = self.tokens.get(self.current) {
             self.current += 1;
 
             // Parse the left-hand side (lhs) expression
             let lhs = self.parse_expression()?;
 
             // Expect a comma ',' after the lhs
-            if let Some(LexItem::Comma(',')) = self.tokens.get(self.current) {
+            if let Some(LexItem::Comma) = self.tokens.get(self.current) {
                 self.current += 1;
             } else {
                 return Err("Expected ',' after left operand of binary expression".to_string());
@@ -210,7 +210,7 @@ impl Parser {
             let rhs = self.parse_expression()?;
 
             // Expect a closing parenthesis ')' after the rhs
-            if let Some(LexItem::CloseParen(')')) = self.tokens.get(self.current) {
+            if let Some(LexItem::CloseParen) = self.tokens.get(self.current) {
                 self.current += 1;
             } else {
                 return Err("Expected closing parenthesis ')'".to_string());
@@ -234,7 +234,7 @@ impl Parser {
 
     fn parse_func_expression(&mut self) -> Result<Expression, String> {
         // Expect the "func" keyword
-        if let Some(LexItem::Func(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Func) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected 'func' keyword".to_string());
@@ -250,7 +250,7 @@ impl Parser {
         };
 
         // Expect the "=>" arrow
-        if let Some(LexItem::Arrow(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Arrow) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected '=>' arrow after function parameter".to_string());
@@ -270,14 +270,14 @@ impl Parser {
 
     fn parse_apply_expression(&mut self) -> Result<Expression, String> {
         // Expect the "apply" keyword
-        if let Some(LexItem::Apply(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Apply) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected 'apply' keyword".to_string());
         }
 
         // Expect an opening parenthesis '('
-        if let Some(LexItem::OpenParen(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::OpenParen) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err(
@@ -290,7 +290,7 @@ impl Parser {
         let func_expr = self.parse_expression()?;
 
         // Expect a comma ','
-        if let Some(LexItem::Comma(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Comma) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected comma ',' after function expression".to_string());
@@ -300,7 +300,7 @@ impl Parser {
         let arg_expr = self.parse_expression()?;
 
         // Expect a closing parenthesis ')'
-        if let Some(LexItem::CloseParen(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::CloseParen) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err(
@@ -320,7 +320,7 @@ impl Parser {
 
     fn parse_if_expression(&mut self) -> Result<Expression, String> {
         // Expect the "if" keyword
-        if let Some(LexItem::If(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::If) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected 'if' keyword".to_string());
@@ -330,7 +330,7 @@ impl Parser {
         let condition_expr = self.parse_expression()?;
 
         // Expect the "then" keyword
-        if let Some(LexItem::Then(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Then) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected 'then' keyword".to_string());
@@ -340,7 +340,7 @@ impl Parser {
         let true_expr = self.parse_expression()?;
 
         // Expect the "else" keyword
-        if let Some(LexItem::Else(_)) = self.tokens.get(self.current) {
+        if let Some(LexItem::Else) = self.tokens.get(self.current) {
             self.current += 1;
         } else {
             return Err("Expected 'else' keyword".to_string());
