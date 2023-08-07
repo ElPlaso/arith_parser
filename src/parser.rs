@@ -13,7 +13,7 @@ pub enum LexItem {
     Else,             // "else"
     Func,             // "func"
     Apply,            // "apply"
-    BinaryOp(BinaryOperator), // "+", "-", "*", "/", "<", "="
+    BinaryOp(BinaryOperator), // "+", "-", "*", "/", "<", "=", "&", "|"
     UnaryOp(UnaryOperator),   // "!"
     Arrow,            // "=>"
 }
@@ -103,6 +103,14 @@ pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
                         }
                     }
                 }
+            }
+            '&' => {
+                result.push(LexItem::BinaryOp(BinaryOperator::And));
+                iterable.next();
+            }
+            '|' => {
+                result.push(LexItem::BinaryOp(BinaryOperator::Or));
+                iterable.next();
             }
             '(' => {
                 result.push(LexItem::OpenParen);

@@ -236,6 +236,24 @@ mod arith_tests {
     }
 
     #[test]
+    fn parse_and() {
+        let mut prog = Parser::new(&"&(T, T)");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("T & T", format!("{}", e));
+    }
+
+    #[test]
+    fn parse_or() {
+        let mut prog = Parser::new(&"|(T, T)");
+        let result = prog.parse();
+        assert!(result.is_ok());
+        let e = result.unwrap();
+        assert_eq!("T | T", format!("{}", e));
+    }
+
+    #[test]
     fn parse_not() {
         let mut prog = Parser::new(&"!T");
         let result = prog.parse();
