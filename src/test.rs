@@ -477,3 +477,110 @@ mod eval_tests {
     }
 }
 
+#[cfg(test)]
+mod nested_enum_tests {
+    use crate::expression::{BinaryOperator, Expression};
+
+    #[test]
+    fn eval_nested_addition() {
+        // Test: +(1, +(2, 3))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::Add,
+            lhs: Box::new(Expression::Integer(1)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::Add,
+                lhs: Box::new(Expression::Integer(2)),
+                rhs: Box::new(Expression::Integer(3)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Integer(6), result.unwrap());
+    }
+
+    #[test]
+    fn eval_nested_subtraction() {
+        // Test: -(10, -(5, 3))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::Subtract,
+            lhs: Box::new(Expression::Integer(10)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::Subtract,
+                lhs: Box::new(Expression::Integer(5)),
+                rhs: Box::new(Expression::Integer(3)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Integer(8), result.unwrap());
+    }
+
+    #[test]
+    fn eval_nested_multiplication() {
+        // Test: *(3, *(2, 4))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::Multiply,
+            lhs: Box::new(Expression::Integer(3)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::Multiply,
+                lhs: Box::new(Expression::Integer(2)),
+                rhs: Box::new(Expression::Integer(4)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Integer(24), result.unwrap());
+    }
+
+    #[test]
+    fn eval_nested_division() {
+        // Test: /(15, /(6, 2))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::Divide,
+            lhs: Box::new(Expression::Integer(15)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::Divide,
+                lhs: Box::new(Expression::Integer(6)),
+                rhs: Box::new(Expression::Integer(2)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Integer(5), result.unwrap());
+    }
+
+    #[test]
+    fn eval_nested_and() {
+        // Test: &(T, &(F, T))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::And,
+            lhs: Box::new(Expression::Boolean(true)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::And,
+                lhs: Box::new(Expression::Boolean(false)),
+                rhs: Box::new(Expression::Boolean(true)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Boolean(false), result.unwrap());
+    }
+
+    #[test]
+    fn eval_nested_or() {
+        // Test: |(T, |(F, T))
+        let expression = Expression::BinaryOp {
+            op: BinaryOperator::Or,
+            lhs: Box::new(Expression::Boolean(true)),
+            rhs: Box::new(Expression::BinaryOp {
+                op: BinaryOperator::Or,
+                lhs: Box::new(Expression::Boolean(false)),
+                rhs: Box::new(Expression::Boolean(true)),
+            }),
+        };
+        let result = expression.eval();
+        assert!(result.is_ok());
+        assert_eq!(Expression::Boolean(true), result.unwrap());
+
+    }
+}
