@@ -221,7 +221,23 @@ impl Expression {
                     _ => Err("Invalid function expression in apply".to_string()),
                 }
             }
-            Expression::If { condition, then_expr, else_expr } => todo!(),  
+            Expression::If {
+                condition,
+                then_expr,
+                else_expr,
+            } => {
+                let eval_condition = condition.eval()?;
+                match eval_condition {
+                    Expression::Boolean(cond) => {
+                        if cond {
+                            then_expr.eval()
+                        } else {
+                            else_expr.eval()
+                        }
+                    }
+                    _ => Err("Invalid condition for 'If' expression".to_string()),
+                }
+            }
         }
     }
 }

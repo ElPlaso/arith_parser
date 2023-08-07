@@ -670,3 +670,33 @@ mod apply_tests {
         assert_eq!(result, Ok(Expression::Boolean(false)));
     }
 }
+
+#[cfg(test)]
+mod if_expression_tests {
+    use crate::expression::Expression;
+    use crate::parser::Parser;
+
+    #[test]
+    fn eval_if_true() {
+        // if T then 2 else 3
+        let mut prog = Parser::new("if T then 2 else 3");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(2)));
+    }
+
+    #[test]
+    fn eval_if_false() {
+        // if F then 2 else 3
+        let mut prog = Parser::new("if F then 2 else 3");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(3)));
+    }
+
+    #[test]
+    fn eval_nested_if() {
+        // if <(2, 3) then if T then 4 else 5 else 6
+        let mut prog = Parser::new("if <(2, 3) then if T then 4 else 5 else 6");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(4)));
+    }
+}
