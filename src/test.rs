@@ -478,7 +478,7 @@ mod eval_tests {
 }
 
 #[cfg(test)]
-mod nested_enum_tests {
+mod nested_eval_tests {
     use crate::expression::{BinaryOperator, Expression};
 
     #[test]
