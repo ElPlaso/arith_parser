@@ -52,7 +52,7 @@ mod display_tests {
                 rhs: Box::new(Expression::Integer(2)),
             }),
         };
-        assert_eq!(format!("{}", expr), "fn x => x * 2");
+        assert_eq!(format!("{}", expr), "func x => x * 2");
     }
 
     #[test]
