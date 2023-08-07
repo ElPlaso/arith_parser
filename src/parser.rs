@@ -164,6 +164,7 @@ impl Parser {
                 }
                 LexItem::UnaryOp(op) => self.parse_unary_expression(op.clone()),
                 LexItem::BinaryOp(op) => self.parse_binary_expression(op.clone()),
+                LexItem::Func(_) => self.parse_func_expression(),
                 _ => Err("Expected expression".to_string()),
             }
         } else {
@@ -222,5 +223,41 @@ impl Parser {
                     .to_string(),
             )
         }
+    }
+
+    fn parse_func_expression(&mut self) -> Result<Expression, String> {
+        // Expect the "func" keyword
+        if let Some(LexItem::Func(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected 'func' keyword".to_string());
+        }
+    
+        // Expect a variable name
+        let param_name = match self.tokens.get(self.current) {
+            Some(LexItem::Variable(name)) => {
+                self.current += 1;
+                name.clone()
+            }
+            _ => return Err("Expected variable name as function parameter".to_string()),
+        };
+    
+        // Expect the "=>" arrow
+        if let Some(LexItem::Arrow(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected '=>' arrow after function parameter".to_string());
+        }
+    
+        // Parse the body expression
+        let body_expr = self.parse_expression()?;
+    
+        // Construct the Func expression
+        let func_expr = Expression::Func {
+            param: param_name,
+            body: Box::new(body_expr),
+        };
+    
+        Ok(func_expr)
     }
 }
