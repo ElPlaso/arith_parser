@@ -183,8 +183,12 @@ impl Parser {
     }
 
     fn parse_binary_expression(&mut self, op: BinaryOperator) -> Result<Expression, String> {
-        // Increment the current index to move past the binary operator token
-        self.current += 1;
+        // Expect a binary operator
+        if let Some(LexItem::BinaryOp(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected a binary operator".to_string());
+        }
 
         // Expect an opening parenthesis '('
         if let Some(LexItem::OpenParen('(')) = self.tokens.get(self.current) {
