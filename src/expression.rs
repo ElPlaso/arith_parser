@@ -59,11 +59,7 @@ impl Display for Expression {
                 condition,
                 then_expr,
                 else_expr,
-            } => write!(
-                f,
-                "if {} then {} else {}",
-                condition, then_expr, else_expr
-            ),
+            } => write!(f, "if {} then {} else {}", condition, then_expr, else_expr),
             Expression::Apply {
                 func_expr,
                 arg_expr,
@@ -81,8 +77,8 @@ impl Display for BinaryOperator {
             BinaryOperator::Divide => write!(f, "/"),
             BinaryOperator::LessThan => write!(f, "<"),
             BinaryOperator::Equals => write!(f, "="),
-            BinaryOperator::And => write!(f, "&&"),
-            BinaryOperator::Or => write!(f, "||"),
+            BinaryOperator::And => write!(f, "&"),
+            BinaryOperator::Or => write!(f, "|"),
         }
     }
 }
