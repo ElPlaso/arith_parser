@@ -1,6 +1,6 @@
 use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum LexItem {
     OpenParen(char),          // "("
     CloseParen(char),         // ")"
@@ -163,7 +163,7 @@ impl Parser {
                     Ok(Expression::Boolean(*value))
                 }
                 LexItem::UnaryOp(op) => self.parse_unary_expression(op.clone()),
-
+                LexItem::BinaryOp(op) => self.parse_binary_expression(op.clone()),
                 _ => Err("Expected expression".to_string()),
             }
         } else {
@@ -178,5 +178,49 @@ impl Parser {
             op,
             child: Box::new(child),
         })
+    }
+
+    fn parse_binary_expression(&mut self, op: BinaryOperator) -> Result<Expression, String> {
+        // Increment the current index to move past the binary operator token
+        self.current += 1;
+
+        // Expect an opening parenthesis '('
+        if let Some(LexItem::OpenParen('(')) = self.tokens.get(self.current) {
+            self.current += 1;
+
+            // Parse the left-hand side (lhs) expression
+            let lhs = self.parse_expression()?;
+
+            // Expect a comma ',' after the lhs
+            if let Some(LexItem::Comma(',')) = self.tokens.get(self.current) {
+                self.current += 1;
+            } else {
+                return Err("Expected ',' after left operand of binary expression".to_string());
+            }
+
+            // Parse the right-hand side (rhs) expression
+            let rhs = self.parse_expression()?;
+
+            // Expect a closing parenthesis ')' after the rhs
+            if let Some(LexItem::CloseParen(')')) = self.tokens.get(self.current) {
+                self.current += 1;
+            } else {
+                return Err("Expected closing parenthesis ')'".to_string());
+            }
+
+            // Construct the BinaryOp expression
+            let binary_expr = Expression::BinaryOp {
+                op,
+                lhs: Box::new(lhs),
+                rhs: Box::new(rhs),
+            };
+
+            Ok(binary_expr)
+        } else {
+            Err(
+                "Expected opening parenthesis '('. Parentheses are required for binary operations."
+                    .to_string(),
+            )
+        }
     }
 }
