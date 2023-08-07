@@ -283,7 +283,7 @@ mod arith_tests {
 
 #[cfg(test)]
 mod nested_tests {
-    
+
     use crate::parser::Parser;
 
     #[test]
@@ -310,7 +310,10 @@ mod nested_tests {
         let result = prog.parse();
         assert!(result.is_ok());
         let e = result.unwrap();
-        assert_eq!("if 1 < 5 then if 2 < 3 then 2 else 3 else 4", format!("{}", e));
+        assert_eq!(
+            "if 1 < 5 then if 2 < 3 then 2 else 3 else 4",
+            format!("{}", e)
+        );
     }
 
     #[test]
@@ -327,7 +330,8 @@ mod nested_tests {
 
     #[test]
     fn parse_nested_multiple_ifs() {
-        let mut prog = Parser::new(&"if <(1, 5) then if <(2, 3) then 2 else 3 else if <(4, 6) then 6 else 4");
+        let mut prog =
+            Parser::new(&"if <(1, 5) then if <(2, 3) then 2 else 3 else if <(4, 6) then 6 else 4");
         let result = prog.parse();
         assert!(result.is_ok());
         let e = result.unwrap();
@@ -340,6 +344,7 @@ mod nested_tests {
 
 #[cfg(test)]
 mod eval_tests {
+
     use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
     #[test]
@@ -471,3 +476,4 @@ mod eval_tests {
         assert_eq!(result, Ok(Expression::Boolean(false)));
     }
 }
+

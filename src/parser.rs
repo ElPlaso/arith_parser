@@ -286,7 +286,7 @@ impl Parser {
             );
         }
 
-        // Expect the function expression
+        // Parse the function expression
         let func_expr = self.parse_expression()?;
 
         // Expect a comma ','
