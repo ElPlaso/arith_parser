@@ -283,6 +283,7 @@ mod arith_tests {
 
 #[cfg(test)]
 mod nested_tests {
+    
     use crate::parser::Parser;
 
     #[test]
@@ -334,5 +335,139 @@ mod nested_tests {
             "if 1 < 5 then if 2 < 3 then 2 else 3 else if 4 < 6 then 6 else 4",
             format!("{}", e)
         );
+    }
+}
+
+#[cfg(test)]
+mod eval_tests {
+    use crate::expression::{BinaryOperator, Expression, UnaryOperator};
+
+    #[test]
+    fn eval_integer() {
+        let expr = Expression::Integer(42);
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Integer(42)));
+    }
+
+    #[test]
+    fn eval_variable() {
+        let expr = Expression::Variable("x".to_string());
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Variable("x".to_string())));
+    }
+
+    #[test]
+    fn eval_boolean() {
+        let expr = Expression::Boolean(true);
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_not_true() {
+        let expr = Expression::UnaryOp {
+            op: UnaryOperator::Not,
+            child: Box::new(Expression::Boolean(true)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(false)));
+    }
+
+    #[test]
+    fn eval_not_false() {
+        let expr = Expression::UnaryOp {
+            op: UnaryOperator::Not,
+            child: Box::new(Expression::Boolean(false)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_addition() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Add,
+            lhs: Box::new(Expression::Integer(2)),
+            rhs: Box::new(Expression::Integer(3)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Integer(5)));
+    }
+
+    #[test]
+    fn eval_subtraction() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Subtract,
+            lhs: Box::new(Expression::Integer(8)),
+            rhs: Box::new(Expression::Integer(3)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Integer(5)));
+    }
+
+    #[test]
+    fn eval_multiplication() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Multiply,
+            lhs: Box::new(Expression::Integer(2)),
+            rhs: Box::new(Expression::Integer(3)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Integer(6)));
+    }
+
+    #[test]
+    fn eval_division() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Divide,
+            lhs: Box::new(Expression::Integer(10)),
+            rhs: Box::new(Expression::Integer(2)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Integer(5)));
+    }
+
+    #[test]
+    fn eval_less_than_true() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::LessThan,
+            lhs: Box::new(Expression::Integer(3)),
+            rhs: Box::new(Expression::Integer(5)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_less_than_false() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::LessThan,
+            lhs: Box::new(Expression::Integer(8)),
+            rhs: Box::new(Expression::Integer(5)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(false)));
+    }
+
+    #[test]
+    fn eval_equals_true() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Equals,
+            lhs: Box::new(Expression::Integer(4)),
+            rhs: Box::new(Expression::Integer(4)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_equals_false() {
+        let expr = Expression::BinaryOp {
+            op: BinaryOperator::Equals,
+            lhs: Box::new(Expression::Integer(2)),
+            rhs: Box::new(Expression::Integer(5)),
+        };
+        let result = expr.eval();
+        assert_eq!(result, Ok(Expression::Boolean(false)));
     }
 }
