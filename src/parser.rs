@@ -1,6 +1,6 @@
 use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum LexItem {
     OpenParen(char),          // "("
     CloseParen(char),         // ")"
@@ -18,7 +18,7 @@ pub enum LexItem {
     Arrow(String),            // "=>"
 }
 
-fn lex(input: &str) -> Result<Vec<LexItem>, String> {
+pub fn lex(input: &str) -> Result<Vec<LexItem>, String> {
     let mut result = Vec::new();
 
     let mut iterable = input.chars().peekable();
@@ -103,6 +103,22 @@ fn lex(input: &str) -> Result<Vec<LexItem>, String> {
                         }
                     }
                 }
+            }
+            '(' => {
+                result.push(LexItem::OpenParen('('));
+                iterable.next();
+            }
+            ',' => {
+                result.push(LexItem::Comma(','));
+                iterable.next();
+            }
+            ')' => {
+                result.push(LexItem::CloseParen(')'));
+                iterable.next();
+            }
+            ' ' | '\t' => {
+                // Skip whitespace
+                iterable.next();
             }
             _ => {
                 return Err(format!("unexpected character {}", c));

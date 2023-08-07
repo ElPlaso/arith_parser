@@ -76,6 +76,81 @@ mod display_tests {
 }
 
 #[cfg(test)]
+mod lexing_tests {
+    use crate::parser::{lex, LexItem};
+    use crate::expression::BinaryOperator;
+
+    #[test]
+    fn lex_integer() {
+        let input = "123";
+        let result = lex(input);
+        assert_eq!(result, Ok(vec![LexItem::Integer(123)]));
+    }
+
+    #[test]
+    fn lex_variable() {
+        let input = "abc";
+        let result = lex(input);
+        assert_eq!(result, Ok(vec![LexItem::Variable("abc".to_string())]));
+    }
+
+    #[test]
+    fn lex_boolean_true() {
+        let input = "T";
+        let result = lex(input);
+        assert_eq!(result, Ok(vec![LexItem::Boolean(true)]));
+    }
+
+    #[test]
+    fn lex_boolean_false() {
+        let input = "F";
+        let result = lex(input);
+        assert_eq!(result, Ok(vec![LexItem::Boolean(false)]));
+    }
+
+    #[test]
+    fn lex_binary_operator() {
+        let input = "+";
+        let result = lex(input);
+        assert_eq!(result, Ok(vec![LexItem::BinaryOp(BinaryOperator::Add)]));
+    }
+
+    #[test]
+    fn lex_addition_expression() {
+        let input = "+(1, 1)";
+        let result = lex(input);
+        assert_eq!(
+            result,
+            Ok(vec![
+                LexItem::BinaryOp(BinaryOperator::Add),
+                LexItem::OpenParen('('),
+                LexItem::Integer(1),
+                LexItem::Comma(','),
+                LexItem::Integer(1),
+                LexItem::CloseParen(')')
+            ])
+        );
+    }
+
+    #[test]
+    fn lex_subtraction_expression() {
+        let input = "-(1, 1)";
+        let result = lex(input);
+        assert_eq!(
+            result,
+            Ok(vec![
+                LexItem::BinaryOp(BinaryOperator::Subtract),
+                LexItem::OpenParen('('),
+                LexItem::Integer(1),
+                LexItem::Comma(','),
+                LexItem::Integer(1),
+                LexItem::CloseParen(')')
+            ])
+        );
+    }
+}
+
+#[cfg(test)]
 mod arith_tests {
     use crate::parser::Parser;
 
