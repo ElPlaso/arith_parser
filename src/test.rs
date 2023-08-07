@@ -581,6 +581,74 @@ mod nested_eval_tests {
         let result = expression.eval();
         assert!(result.is_ok());
         assert_eq!(Expression::Boolean(true), result.unwrap());
+    }
+}
 
+#[cfg(test)]
+mod apply_tests {
+    use crate::expression::Expression;
+    use crate::parser::Parser;
+
+    #[test]
+    fn eval_apply_addition() {
+        let mut prog = Parser::new("apply(func x => +(x, 1), 2)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(3)));
+    }
+
+    #[test]
+    fn eval_apply_subtraction() {
+        let mut prog = Parser::new("apply(func x => -(x, 2), 5)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(3)));
+    }
+
+    #[test]
+    fn eval_apply_multiplication() {
+        let mut prog = Parser::new("apply(func x => *(x, 3), 4)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(12)));
+    }
+
+    #[test]
+    fn eval_apply_division() {
+        let mut prog = Parser::new("apply(func x => /(x, 2), 10)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Integer(5)));
+    }
+
+    #[test]
+    fn eval_apply_equals() {
+        let mut prog = Parser::new("apply(func x => =(x, 3), 3)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_apply_less_than() {
+        let mut prog = Parser::new("apply(func x => <(x, 5), 3)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_apply_and() {
+        let mut prog = Parser::new("apply(func x => &(x, T), F)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Boolean(false)));
+    }
+
+    #[test]
+    fn eval_apply_or() {
+        let mut prog = Parser::new("apply(func x => |(x, T), F)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Boolean(true)));
+    }
+
+    #[test]
+    fn eval_apply_not() {
+        let mut prog = Parser::new("apply(func x => !x, T)");
+        let result = prog.parse().unwrap().eval();
+        assert_eq!(result, Ok(Expression::Boolean(false)));
     }
 }

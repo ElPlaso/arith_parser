@@ -29,7 +29,7 @@ pub enum Expression {
     },
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -41,7 +41,7 @@ pub enum BinaryOperator {
     Or,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum UnaryOperator {
     Not,
 }
@@ -199,9 +199,61 @@ impl Expression {
                     }
                 }
             }
-            Expression::Func { param, body } => todo!(),
-            Expression::If { condition, then_expr, else_expr } => todo!(),
-            Expression::Apply { func_expr, arg_expr } => todo!(),
+            Expression::Func { param: _, body: _ } => {
+                // Functions are not evaluated directly, they are kept as closures
+                // The closure captures the current environment and the parameter
+                Ok(self.clone())
+            }
+            Expression::Apply { func_expr, arg_expr } => {
+                // Evaluate the function expression and the argument expression
+                let eval_func = func_expr.eval()?;
+                let eval_arg = arg_expr.eval()?;
+
+                // Apply the function to the argument
+                match eval_func {
+                    Expression::Func { param, body } => {
+                        // Substitute the argument value into the function body
+                        let substituted_body = substitute(&body, &param, &eval_arg);
+
+                        // Evaluate the substituted body
+                        substituted_body.eval()
+                    }
+                    _ => Err("Invalid function expression in apply".to_string()),
+                }
+            }
+            Expression::If { condition, then_expr, else_expr } => todo!(),  
         }
+    }
+}
+
+// Helper function to substitute a parameter with an argument in an expression
+fn substitute(expr: &Expression, param: &str, arg: &Expression) -> Expression {
+    match expr {
+        Expression::Integer(_) | Expression::Boolean(_) => expr.clone(),
+
+        Expression::Variable(var_name) => {
+            if var_name == param {
+                arg.clone()
+            } else {
+                expr.clone()
+            }
+        }
+
+        Expression::UnaryOp { op, child } => {
+            Expression::UnaryOp {
+                op: *op,
+                child: Box::new(substitute(child, param, arg)),
+            }
+        }
+
+        Expression::BinaryOp { op, lhs, rhs } => {
+            Expression::BinaryOp {
+                op: *op,
+                lhs: Box::new(substitute(lhs, param, arg)),
+                rhs: Box::new(substitute(rhs, param, arg)),
+            }
+        }
+
+        _ => expr.clone(),
     }
 }
