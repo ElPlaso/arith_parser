@@ -1,5 +1,4 @@
 #[cfg(test)]
-
 mod display_tests {
     use crate::expression::{BinaryOperator, Expression, UnaryOperator};
 
@@ -72,12 +71,12 @@ mod display_tests {
             func_expr: Box::new(Expression::Variable("f".to_string())),
             arg_expr: Box::new(Expression::Integer(10)),
         };
-        assert_eq!(format!("{}", expr), "f 10");
+        assert_eq!(format!("{}", expr), "f (10)");
     }
 }
 
+#[cfg(test)]
 mod arith_tests {
-    use crate::expression::Expression;
     use crate::parser::Parser;
 
     #[test]

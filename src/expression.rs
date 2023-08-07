@@ -67,7 +67,7 @@ impl Display for Expression {
             Expression::Apply {
                 func_expr,
                 arg_expr,
-            } => write!(f, "{} {}", func_expr, arg_expr),
+            } => write!(f, "{} ({})", func_expr, arg_expr),
         }
     }
 }
