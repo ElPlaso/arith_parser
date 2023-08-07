@@ -166,6 +166,8 @@ impl Parser {
                 LexItem::BinaryOp(op) => self.parse_binary_expression(op.clone()),
                 LexItem::Func(_) => self.parse_func_expression(),
                 LexItem::Apply(_) => self.parse_apply_expression(),
+                LexItem::If(_) => self.parse_if_expression(),
+
                 _ => Err("Expected expression".to_string()),
             }
         } else {
@@ -314,5 +316,46 @@ impl Parser {
         };
 
         Ok(apply_expr)
+    }
+
+    fn parse_if_expression(&mut self) -> Result<Expression, String> {
+        // Expect the "if" keyword
+        if let Some(LexItem::If(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected 'if' keyword".to_string());
+        }
+
+        // Parse the condition expression
+        let condition_expr = self.parse_expression()?;
+
+        // Expect the "then" keyword
+        if let Some(LexItem::Then(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected 'then' keyword".to_string());
+        }
+
+        // Parse the true branch expression
+        let true_expr = self.parse_expression()?;
+
+        // Expect the "else" keyword
+        if let Some(LexItem::Else(_)) = self.tokens.get(self.current) {
+            self.current += 1;
+        } else {
+            return Err("Expected 'else' keyword".to_string());
+        }
+
+        // Parse the false branch expression
+        let false_expr = self.parse_expression()?;
+
+        // Construct the If expression
+        let if_expr = Expression::If {
+            condition: Box::new(condition_expr),
+            then_expr: Box::new(true_expr),
+            else_expr: Box::new(false_expr),
+        };
+
+        Ok(if_expr)
     }
 }
