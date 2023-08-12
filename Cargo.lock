@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "assignment"
+name = "arith-parser"
 version = "0.1.0"
